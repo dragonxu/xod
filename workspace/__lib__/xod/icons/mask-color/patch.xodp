@@ -1,0 +1,43 @@
+{
+  "description": "Disguise a color from an RGB image. The specified color is ignored during rendering.",
+  "nodes": [
+    {
+      "description": "Mask color.",
+      "id": "B1dIQp4PU",
+      "label": "MSK",
+      "position": {
+        "units": "slots",
+        "x": 2,
+        "y": 0
+      },
+      "type": "xod/color/input-color"
+    },
+    {
+      "id": "By2rXpEvL",
+      "position": {
+        "units": "slots",
+        "x": 0,
+        "y": 2
+      },
+      "type": "@/output-bitmap"
+    },
+    {
+      "id": "H1iBX6EDL",
+      "position": {
+        "units": "slots",
+        "x": 0,
+        "y": 0
+      },
+      "type": "@/input-bitmap"
+    },
+    {
+      "id": "Hk1vmTNP8",
+      "position": {
+        "units": "slots",
+        "x": 0,
+        "y": 1
+      },
+      "type": "xod/patch-nodes/not-implemented-in-xod"
+    }
+  ]
+}
