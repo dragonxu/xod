@@ -72,11 +72,28 @@ TransactionState g_transaction;
 
 #if defined(XOD_DEBUG) || defined(XOD_SIMULATION)
 namespace detail {
-void handleTweaks() {
-    if (XOD_DEBUG_SERIAL.available() > 0 && XOD_DEBUG_SERIAL.find("+XOD:", 5)) {
+void handleDebugProtocolMessages() {
+    {{#forLinkedTetheringInetNode nodes}}
+    bool tetheringInetNodeReceivingData = node_{{ id }}.output_INET->isReceiving();
+    {{/forLinkedTetheringInetNode}}
+
+    if (
+      XOD_DEBUG_SERIAL.available() > 0 &&
+      {{#forLinkedTetheringInetNode nodes}}
+      !tetheringInetNodeReceivingData &&
+      {{/forLinkedTetheringInetNode}}
+      XOD_DEBUG_SERIAL.find("+XOD:", 5)
+    ) {
         int tweakedNodeId = XOD_DEBUG_SERIAL.parseInt();
 
         switch (tweakedNodeId) {
+          {{#forLinkedTetheringInetNode nodes}}
+            case {{ id }}:
+              node_{{ id }}.output_INET->beginReceiving(XOD_DEBUG_SERIAL.parseInt());
+              XOD_DEBUG_SERIAL.read(); // :
+              // The rest of data should be read by nodes
+              break;
+          {{/forLinkedTetheringInetNode}}
           {{#eachLinkedTweakNode nodes}}
             case {{ id }}:
                 {
@@ -107,16 +124,14 @@ void handleTweaks() {
                     };
                   {{/case}}
                 {{/switchByTweakType}}
+                    XOD_DEBUG_SERIAL.find('\n');
                     // to run evaluate and mark all downstream nodes as dirty
                     g_transaction.node_{{ id }}_isNodeDirty = true;
                     g_transaction.node_{{ id }}_isOutputDirty_OUT = true;
                 }
                 break;
-
           {{/eachLinkedTweakNode}}
         }
-
-        XOD_DEBUG_SERIAL.find('\n');
     }
 }
 } // namespace detail
@@ -252,7 +267,7 @@ void runTransaction() {
     XOD_TRACE_LN(g_transactionTime);
 
 #if defined(XOD_DEBUG) || defined(XOD_SIMULATION)
-    detail::handleTweaks();
+    detail::handleDebugProtocolMessages();
 #endif
 
     // Check for timeouts
