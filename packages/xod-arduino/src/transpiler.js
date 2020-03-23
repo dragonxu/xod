@@ -77,6 +77,13 @@ export const hasTetheringInternetNode = def(
   R.compose(R.not, R.isNil, findLinkedTetheringInetNode, R.prop('nodes'))
 );
 
+// :: TProject -> Nullable Int
+export const getTetheringInetNodeId = R.compose(
+  R.unless(R.isNil, R.prop('id')),
+  findLinkedTetheringInetNode,
+  R.prop('nodes')
+);
+
 //-----------------------------------------------------------------------------
 //
 // Transformers
